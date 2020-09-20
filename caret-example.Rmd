@@ -5,6 +5,8 @@ output:
     df_print: paged
 ---
 
+# {.tabset .tabset-fade .tabset-pills}
+
 From the [Caret Bookdown by Max Kuhn](https://topepo.github.io/caret/index.html): 
 
 >The caret package (short for Classification And REgression Training) is a set of functions that attempt to streamline the process for creating predictive models. The package contains tools for:
@@ -17,9 +19,12 @@ From the [Caret Bookdown by Max Kuhn](https://topepo.github.io/caret/index.html)
 
 >as well as other functionality.
 
-[Data Analysis](/Users/aaronmamula/Documents/R projects/rad-teaching-stuff/caret-example/figures/xkcd_comic.png)
+```{r}
+library(here)
+knitr::include_graphics(here('figures/xkcd_comic.png'))
+```
 
-# Introduction
+## Introduction
 
 In this notebook I will use R's [caret](http://caret.r-forge.r-project.org/) library to train two predictive models: an Artificial Neural Network and a Gradient Boosted Classification Tree.  The empirical setting is the following: I have location data on fishing vessels from satellite tracking system logged at approximately hourly time intervals (polls) and I wish to fit a model capable of classifying an unlabeled observation according to whether the vessel was fishing or not fishing at the time of the poll.
 
@@ -35,7 +40,10 @@ to highlight how functions in the caret library can be combined to establish a m
 2. dealing with NAs or outliers
 3. examining final models visually
 
-[Data Pipeline](/Users/aaronmamula/Documents/R projects/rad-teaching-stuff/caret-example/figures/datapipeline.png)
+```{r}
+knitr::include_graphics(here('figures/datapipeline.png'))
+```
+
 
 ## Dependencies
 
@@ -58,10 +66,9 @@ library(nnet)
 library(lubridate)
 library(gbm)
 library(NeuralNetTools)
-library(here)
 ```
 
-# Empirical Setting
+## Empirical Setting
 
 These data come from a satellite monitoring system that tracks the location of commercial fishing vessels in the U.S.  These data are logged on hourly intervals and record a vessel's location in lat/long coordinates and provide a time stamp.  
 
@@ -98,11 +105,11 @@ The object of the empirical exercise is to train a model capable of classifying 
     + speed - instantaneous speed
     + bottom_depth - ocean bottom depth
   
-# The Models
+## The Models {.tabset}
 
 I don't intend to discuss the particulars of ANNs and Gradient Boosting here.  I'm assuming a decent level of familiarity with these models and concepts so I can focus on the details of using the [caret](http://topepo.github.io/caret/index.html) library to train the models.  Check out the links below to dive into the models:
 
-## ANNs
+### ANNs
 
 [Watch this video](https://www.youtube.com/watch?v=Ilg3gGewQ5U) to get a really cool look at optimizing a neural network using the backpropagation algorithm.
 
@@ -110,16 +117,15 @@ The cononical resource for all things machine learning [Hastie, Tibshirani, and 
 
 I also like [this ebook specifically on Neural Networks](http://www.dkriesel.com/_media/science/neuronalenetze-en-zeta2-2col-dkrieselcom.pdf) by David Kriesel.
 
-## GBM
+### GBM
 
 Again, a great place to start is [Hastie, Tibshirani, and Freidman](https://web.stanford.edu/~hastie/Papers/ESLII.pdf). Gradient Boosting isn't as well contained as Neural Networks and the concepts kind of pops up in a lot of places.  Chapter 10 is a pretty good place to start for readers interested in gradient boosting trees.
-
 
 [Here are some slides](https://homes.cs.washington.edu/~tqchen/pdf/BoostedTree.pdf) from a Computer Science Lecture at U. Washington that I think give a nice overview and reasonably rigorous presentation of GBM.
 
 [Here is a neat hands-on](http://uc-r.github.io/gbm_regression) vignette. 
 
-# Training the Models with CARET
+## Training the Models with CARET {.tabset}
 
 For this example I'm going to do a couple things outside of the caret environment:
 
@@ -143,8 +149,7 @@ df <- df %>% filter(year(local_time) == 2014 & month(local_time) %in% c(7,8,9)) 
 str(df)
 ```
 
-
-## Splitting Data
+### Splitting Data
 
 The caret library has a ```createDataPartition()``` method that can split your data into training and testing partitions.  By default, the sampling scheme used by ```createDataPartition()``` will attempt to balance the class distribution of the target variable among splits.  [From the documentation](https://topepo.github.io/caret/data-splitting.html)
 
@@ -195,8 +200,7 @@ head(df)
 df <- df %>% select(-fold)
 ```
 
-
-## Preprocessing
+### Preprocessing
 
 I'm going to do a pretty mundane and popular data transformation here: I'm going to normalize my continuous variables (speed, bottom_depth, and bearing) so that lie on the [0,1] interval.  This is a common processing step done in machine learning to avoid scale bias.  Noteably however, I want to leave my categorical variables alone.  
 
@@ -218,7 +222,7 @@ The output here tells us that 3 categorical variables were ignored and 3 continu
 head(trainTransformed)
 ```
 
-## Setting hyper-parameter grids
+### Setting hyper-parameter grids
 
 In our ```Splitting the Data``` section we reviewed how training data could be split into folds for Cross-Validation using ```createFolds()```.  In practice, caret has a method called ```train()``` that can be used to perform different flavors of cross-validation.
 
@@ -266,11 +270,11 @@ fitControl.GBM <- trainControl(method = "cv",
 
 ```
 
-## Training
+### Training
 
 The real red meat of the caret library is the *train()* function.  *train()* works with [238 models](http://topepo.github.io/caret/available-models.html) from a variety of different R libraries.  
 
-### The ANN
+#### The ANN
 
 In the chunk below we use the preprocessed training data to train a neural network model using the [nnet](https://cran.r-project.org/web/packages/nnet/nnet.pdf) library.
 
@@ -324,7 +328,7 @@ To restate the obvious:
 * nn2 is list object containing the results of a single call to the *nnet()* function
 
 
-### GBM
+#### GBM
 
 ```{r}
 # THIS CURRENTLY TAKES ABOUT 20 MINUTES TO EXECUTE...IF WE DO THIS IN 'REAL TIME' PROBABLY CHANGE THE 
@@ -362,7 +366,7 @@ names(gbmFit$finalModel)
 ```
 
 
-# Prediction
+## Prediction
 
 Using the optimal models - where optimal is defined as the best model in each class conditional on our tuning parameters - we can generate predicted values for the observations in the testing data.  This is done pretty simply using [predict.train()](https://www.rdocumentation.org/packages/caret/versions/5.05.004/topics/predict.train) method, which provides a wrapper to prediction functions associated with each model.
 
@@ -407,7 +411,7 @@ r <- GBM_CM$table[2,2]/(GBM_CM$table[2,2] + GBM_CM$table[1,2])
 ```
 
 
-# Some Fun Post-Processing Visualization
+## Fun Post-Processing Visualization
 
 There are plenty of model diagnostic methods available in caret.  [See Chapters 15 and 18-22](https://topepo.github.io/caret/variable-importance.html).  I'm just going to do a quick demo of two:
 
