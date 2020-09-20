@@ -10,7 +10,15 @@ Code
 ----
 
 The workhorse of this repository is a .rmd file called
-[caret-example.Rmd]()
+[caret-example.Rmd](https://github.com/aaronmams/rHD-ML-w-CARET/blob/master/caret-example.Rmd)
+
+I don’t normally push .html output files up to GitHub but, in this case,
+you may prefer to work with the [caret-example.html]() file while you
+are familiarizing yourself with the particulars of the `CARET` package.
+This is because some of the code chunks in the .rmd file may take around
+20 minutes to execute. I choose to include code chunks that were
+‘realistic’ rather than trivial/illustrative. Maybe this was a mistake.
+Just consider yourself warned.
 
 Dependencies
 ------------
@@ -18,7 +26,7 @@ Dependencies
 I have a simulated data set that goes along with this example. The data
 set is based on the real structure of Vessel Monitoring System data that
 I work with in my professional life. The data file [is here:
-fishing\_data.csv]()
+fishing\_data.csv](https://github.com/aaronmams/rHD-ML-w-CARET/tree/master/data)
 
 It is a .csv file containing ~200,000 simulated data points on fishing
 vessel location and behavior. Each observation has a target variable
