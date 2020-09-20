@@ -12,13 +12,11 @@ Code
 The workhorse of this repository is a .rmd file called
 [caret-example.Rmd](https://github.com/aaronmams/rHD-ML-w-CARET/blob/master/caret-example.Rmd)
 
-I don’t normally push .html output files up to GitHub but, in this case,
-you may prefer to work with the [caret-example.html]() file while you
-are familiarizing yourself with the particulars of the `CARET` package.
-This is because some of the code chunks in the .rmd file may take around
-20 minutes to execute. I elected to include code chunks that were
-‘realistic’ rather than trivial/illustrative. Maybe this was a mistake.
-Just consider yourself warned.
+Please be advised that this .rmd file may take some time (~30-40 mins)
+to run. I could have included code that runs faster by shrinking the
+hyper-parameter space for the machine learning model selection…but I
+elected to include what I thought was a more realistic illustration of
+training ML models in R using CARET.
 
 Dependencies
 ------------
